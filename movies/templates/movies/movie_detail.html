@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ movie.title }} | Movie Management System</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+            line-height: 1.6;
+        }
+
+
+        a {
+            color: inherit;
+        }
+
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        header {
+            background: #111;
+            color: white;
+            padding: 18px 5%;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            gap: 20px;
+        }
+
+
+        .brand {
+            color: white;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+
+        .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+
+        .nav-user a {
+            color: white;
+            text-decoration: none;
+        }
+
+
+        .logout-button {
+            background: white;
+            color: #111;
+            border: none;
+
+            padding: 8px 14px;
+            border-radius: 6px;
+
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+
+        .logout-button:hover {
+            background: #ddd;
+        }
+
+
+        /* =========================
+           MAIN CONTAINER
+        ========================== */
+
+        .container {
+            width: 90%;
+            max-width: 1150px;
+
+            margin: 30px auto;
+        }
+
+
+        .back-link {
+            display: inline-block;
+
+            margin-bottom: 20px;
+
+            text-decoration: none;
+            font-weight: 600;
+
+            color: #222;
+        }
+
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================
+           DJANGO MESSAGES
+        ========================== */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+
+        .message {
+            padding: 12px 16px;
+            margin-bottom: 10px;
+
+            border-radius: 7px;
+            background: #e8f4ff;
+            border: 1px solid #b8dfff;
+        }
+
+
+        /* =========================
+           MOVIE HERO
+        ========================== */
+
+        .movie-hero {
+            background: white;
+
+            border-radius: 12px;
+            padding: 30px;
+
+            display: flex;
+            gap: 30px;
+
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+
+        /* =========================
+           POSTER
+        ========================== */
+
+        .poster-container {
+            width: 280px;
+            min-width: 280px;
+        }
+
+
+        .poster {
+            display: block;
+
+            width: 100%;
+            height: 400px;
+
+            object-fit: cover;
+
+            border-radius: 10px;
+
+            background: #ddd;
+        }
+
+
+        .no-poster {
+            width: 100%;
+            height: 400px;
+
+            border-radius: 10px;
+
+            background: #ddd;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            color: #666;
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           MOVIE INFORMATION
+        ========================== */
+
+        .movie-info {
+            flex: 1;
+        }
+
+
+        .movie-title {
+            font-size: 38px;
+
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+
+        .rating {
+            font-size: 21px;
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+
+        .review-count {
+            font-size: 14px;
+            font-weight: normal;
+            color: #666;
+        }
+
+
+        .movie-meta {
+            margin: 9px 0;
+        }
+
+
+        .movie-meta strong {
+            margin-right: 5px;
+        }
+
+
+        /* =========================
+           TAGS
+        ========================== */
+
+        .tags {
+            margin-top: 8px;
+        }
+
+
+        .tag {
+            display: inline-block;
+
+            background: #eee;
+
+            padding: 6px 12px;
+            margin: 3px 5px 3px 0;
+
+            border-radius: 20px;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           SECTIONS
+        ========================== */
+
+        section {
+            background: white;
+
+            margin-top: 25px;
+            padding: 25px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px rgba(0, 0, 0, 0.06);
+        }
+
+
+        section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+
+        .empty {
+            color: #666;
+        }
+
+
+        /* =========================
+           CAST
+        ========================== */
+
+        .cast-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+
+            gap: 15px;
+        }
+
+
+        .cast-card {
+            border: 1px solid #ddd;
+
+            padding: 18px;
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+
+        .cast-photo {
+            display: block;
+
+            width: 100px;
+            height: 100px;
+
+            object-fit: cover;
+
+            border-radius: 50%;
+
+            margin: 0 auto 12px;
+        }
+
+
+        /* =========================
+           TRAILER
+        ========================== */
+
+        .trailer-wrapper {
+            width: 100%;
+            max-width: 850px;
+
+            aspect-ratio: 16 / 9;
+        }
+
+
+        .trailer-wrapper iframe {
+            width: 100%;
+            height: 100%;
+
+            border: none;
+
+            border-radius: 10px;
+        }
+
+
+        /* =========================
+           SHOWS
+        ========================== */
+
+        .show-card {
+            border: 1px solid #ddd;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .show-card h3 {
+            margin-top: 0;
+        }
+
+
+        .show-info {
+            margin: 6px 0;
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================== */
+
+        .button {
+            display: inline-block;
+
+            background: #111;
+            color: white;
+
+            border: none;
+
+            padding: 10px 18px;
+
+            border-radius: 6px;
+
+            text-decoration: none;
+
+            cursor: pointer;
+
+            font-size: 14px;
+        }
+
+
+        .button:hover {
+            background: #333;
+        }
+
+
+        .sold-out {
+            color: #b00020;
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           REVIEWS
+        ========================== */
+
+        .review-card {
+            border: 1px solid #ddd;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            margin-bottom: 18px;
+        }
+
+
+        .review-title {
+            margin-top: 0;
+        }
+
+
+        .review-rating {
+            font-weight: bold;
+        }
+
+
+        .review-user {
+            font-weight: bold;
+        }
+
+
+        .verified {
+            display: inline-block;
+
+            color: #198754;
+            font-weight: bold;
+
+            margin-left: 6px;
+        }
+
+
+        .review-date {
+            color: #666;
+            font-size: 13px;
+        }
+
+
+        .review-actions {
+            margin-top: 12px;
+        }
+
+
+        .edit-link {
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+
+        .edit-link:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =========================
+           REPORT FORM
+        ========================== */
+
+        .report-form {
+            margin-top: 18px;
+        }
+
+
+        .report-input {
+            width: 100%;
+            max-width: 500px;
+
+            padding: 10px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 6px;
+
+            margin-bottom: 8px;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+            background: #111;
+
+            color: #ccc;
+
+            text-align: center;
+
+            padding: 25px;
+
+            margin-top: 50px;
+        }
+
+
+        footer p {
+            margin: 5px 0;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================== */
+
+        @media (max-width: 750px) {
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+
+            .movie-hero {
+                flex-direction: column;
+            }
+
+
+            .poster-container {
+                width: 100%;
+                max-width: 280px;
+            }
+
+
+            .movie-title {
+                font-size: 30px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================
+     HEADER
+===================================== -->
+
+<header>
+
+    <a
+        href="{% url 'movie_list' %}"
+        class="brand"
+    >
+        🎬 Movie Management System
+    </a>
+
+
+    <div class="nav-user">
+
+        {% if user.is_authenticated %}
+
+            <span>
+                Welcome, {{ user.username }}
+            </span>
+
+
+            <form
+                method="post"
+                action="{% url 'logout' %}"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="logout-button"
+                >
+                    Logout
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</header>
+
+
+
+<div class="container">
+
+
+    <!-- =====================================
+         MESSAGES
+    ====================================== -->
+
+    {% if messages %}
+
+        <div class="messages">
+
+            {% for message in messages %}
+
+                <div class="message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- =====================================
+         BACK LINK
+    ====================================== -->
+
+    <a
+        href="{% url 'movie_list' %}"
+        class="back-link"
+    >
+        ← Back to Movies
+    </a>
+
+
+
+    <!-- =====================================
+         MOVIE INFORMATION
+    ====================================== -->
+
+    <div class="movie-hero">
+
+
+        <!-- POSTER -->
+
+        <div class="poster-container">
+
+            {% with poster=movie.posters.first %}
+
+                {% if poster and poster.image_url %}
+
+                    <img
+                        src="{{ poster.image_url }}"
+                        alt="{{ poster.alt_text|default:movie.title }}"
+                        class="poster"
+                    >
+
+                {% else %}
+
+                    <div class="no-poster">
+                        No Poster Available
+                    </div>
+
+                {% endif %}
+
+            {% endwith %}
+
+        </div>
+
+
+
+        <!-- MOVIE DETAILS -->
+
+        <div class="movie-info">
+
+
+            <h1 class="movie-title">
+                {{ movie.title }}
+            </h1>
+
+
+            <!-- RATING -->
+
+            <div class="rating">
+
+                ⭐ {{ movie.average_rating }}/5
+
+                <span class="review-count">
+
+                    ({{ movie.total_reviews }}
+                    review{{ movie.total_reviews|pluralize }})
+
+                </span>
+
+            </div>
+
+
+            <!-- CERTIFICATION -->
+
+            <p class="movie-meta">
+
+                <strong>
+                    Certification:
+                </strong>
+
+                {% if movie.age_certification %}
+
+                    {{ movie.age_certification }}
+
+                {% else %}
+
+                    Not specified
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- DURATION -->
+
+            <p class="movie-meta">
+
+                <strong>
+                    Duration:
+                </strong>
+
+                {% if movie.duration_minutes %}
+
+                    {{ movie.duration_minutes }} minutes
+
+                {% else %}
+
+                    Not specified
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- RELEASE DATE -->
+
+            <p class="movie-meta">
+
+                <strong>
+                    Release Date:
+                </strong>
+
+                {% if movie.release_date %}
+
+                    {{ movie.release_date|date:"M. d, Y" }}
+
+                {% else %}
+
+                    Not specified
+
+                {% endif %}
+
+            </p>
+
+
+            <!-- GENRES -->
+
+            <div class="movie-meta">
+
+                <strong>
+                    Genres:
+                </strong>
+
+
+                <div class="tags">
+
+                    {% for genre in movie.genres.all %}
+
+                        <span class="tag">
+                            {{ genre.name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="empty">
+                            No genres available
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <!-- LANGUAGES -->
+
+            <div class="movie-meta">
+
+                <strong>
+                    Languages:
+                </strong>
+
+
+                <div class="tags">
+
+                    {% for language in movie.languages.all %}
+
+                        <span class="tag">
+                            {{ language.name }}
+                        </span>
+
+                    {% empty %}
+
+                        <span class="empty">
+                            No languages available
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================
+         DESCRIPTION
+    ====================================== -->
+
+    <section>
+
+        <h2>
+            About the Movie
+        </h2>
+
+
+        {% if movie.description %}
+
+            <p>
+                {{ movie.description }}
+            </p>
+
+        {% else %}
+
+            <p class="empty">
+                Description is not available.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         CAST
+    ====================================== -->
+
+    <section>
+
+        <h2>
+            Cast
+        </h2>
+
+
+        {% for member in movie.cast_members.all %}
+
+            <div class="cast-card">
+
+
+                {% if member.photo_url %}
+
+                    <img
+                        src="{{ member.photo_url }}"
+                        alt="{{ member.name }}"
+                        class="cast-photo"
+                    >
+
+                {% endif %}
+
+
+                <strong>
+                    {{ member.name }}
+                </strong>
+
+
+                {% if member.biography %}
+
+                    <p>
+                        {{ member.biography }}
+                    </p>
+
+                {% endif %}
+
+
+            </div>
+
+        {% empty %}
+
+            <p class="empty">
+                Cast information is not available.
+            </p>
+
+        {% endfor %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         TRAILER
+    ====================================== -->
+
+    <section>
+
+        <h2>
+            Trailer
+        </h2>
+
+
+        {% if movie.trailer_video_id %}
+
+            <div class="trailer-wrapper">
+
+                <iframe
+                    src="https://www.youtube.com/embed/{{ movie.trailer_video_id }}"
+                    title="{{ movie.title }} trailer"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+
+            </div>
+
+        {% else %}
+
+            <p class="empty">
+                Trailer is not available.
+            </p>
+
+        {% endif %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         AVAILABLE SHOWS
+    ====================================== -->
+
+    <section>
+
+        <h2>
+            Available Shows
+        </h2>
+
+
+        {% for show in shows %}
+
+            <div class="show-card">
+
+
+                <h3>
+                    {{ show.theater.name }}
+                </h3>
+
+
+                <p class="show-info">
+
+                    <strong>
+                        City:
+                    </strong>
+
+                    {{ show.theater.city }}
+
+                </p>
+
+
+                <p class="show-info">
+
+                    <strong>
+                        Show Time:
+                    </strong>
+
+                    {{ show.starts_at|date:"M. d, Y, g:i A" }}
+
+                </p>
+
+
+                <p class="show-info">
+
+                    <strong>
+                        Ticket Price:
+                    </strong>
+
+                    ₹{{ show.ticket_price }}
+
+                </p>
+
+
+                <p class="show-info">
+
+                    <strong>
+                        Available Seats:
+                    </strong>
+
+                    {{ show.available_seats }}
+
+                </p>
+
+
+                {% if user.is_authenticated %}
+
+
+                    {% if show.available_seats > 0 %}
+
+                        <form
+                            method="post"
+                            action="{% url 'book_show' movie.id show.id %}"
+                        >
+
+                            {% csrf_token %}
+
+                            <button
+                                type="submit"
+                                class="button"
+                            >
+                                Book Now
+                            </button>
+
+                        </form>
+
+                    {% else %}
+
+                        <p class="sold-out">
+                            Sold Out
+                        </p>
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="button"
+                    >
+                        Login to Book
+                    </a>
+
+                {% endif %}
+
+
+            </div>
+
+        {% empty %}
+
+            <p class="empty">
+                No upcoming shows available.
+            </p>
+
+        {% endfor %}
+
+    </section>
+
+
+
+    <!-- =====================================
+         REVIEWS
+    ====================================== -->
+
+    <section>
+
+        <h2>
+            Reviews
+        </h2>
+
+
+        <!-- REVIEW ELIGIBILITY -->
+
+        {% if user_can_review %}
+
+            <a
+                href="{% url 'create_review' movie.id %}"
+                class="button"
+            >
+                Write a Review
+            </a>
+
+
+        {% elif user.is_authenticated %}
+
+            <p>
+
+                You can review this movie only after
+                watching a booked show.
+
+            </p>
+
+
+        {% else %}
+
+            <p>
+
+                Please log in and watch a booked show
+                before submitting a review.
+
+            </p>
+
+        {% endif %}
+
+
+
+        <!-- REVIEW LIST -->
+
+        <div style="margin-top: 25px;">
+
+
+            {% for review in reviews %}
+
+                <div class="review-card">
+
+
+                    <h3 class="review-title">
+                        {{ review.title }}
+                    </h3>
+
+
+                    <p class="review-rating">
+
+                        ⭐ {{ review.rating }}/5
+
+                    </p>
+
+
+                    <p>
+
+                        <span class="review-user">
+                            {{ review.user.username }}
+                        </span>
+
+
+                        {% if review.is_verified_viewer %}
+
+                            <span class="verified">
+                                ✓ Verified Viewer
+                            </span>
+
+                        {% endif %}
+
+                    </p>
+
+
+                    <p>
+                        {{ review.body }}
+                    </p>
+
+
+                    <p class="review-date">
+
+                        Posted:
+                        {{ review.created_at|date:"M. d, Y, g:i A" }}
+
+                        {% if review.updated_at != review.created_at %}
+
+                            <br>
+
+                            Updated:
+                            {{ review.updated_at|date:"M. d, Y, g:i A" }}
+
+                        {% endif %}
+
+                    </p>
+
+
+
+                    <!-- EDIT OWN REVIEW -->
+
+                    {% if request.user == review.user %}
+
+                        <div class="review-actions">
+
+                            <a
+                                href="{% url 'edit_review' review.id %}"
+                                class="edit-link"
+                            >
+                                Edit Review
+                            </a>
+
+                        </div>
+
+                    {% endif %}
+
+
+
+                    <!-- REPORT OTHER USER'S REVIEW -->
+
+                    {% if request.user.is_authenticated %}
+
+                        {% if request.user != review.user %}
+
+                            <form
+                                method="post"
+                                action="{% url 'report_review' review.id %}"
+                                class="report-form"
+                            >
+
+                                {% csrf_token %}
+
+
+                                <input
+                                    type="text"
+                                    name="reason"
+                                    class="report-input"
+                                    maxlength="250"
+                                    placeholder="Reason for reporting this review"
+                                    required
+                                >
+
+
+                                <br>
+
+
+                                <button
+                                    type="submit"
+                                    class="button"
+                                >
+                                    Report Review
+                                </button>
+
+                            </form>
+
+                        {% endif %}
+
+                    {% endif %}
+
+
+                </div>
+
+
+            {% empty %}
+
+                <p class="empty">
+                    No reviews yet.
+                </p>
+
+            {% endfor %}
+
+
+        </div>
+
+    </section>
+
+
+</div>
+
+
+
+<!-- =====================================
+     FOOTER
+===================================== -->
+
+<footer>
+
+    <p>
+        © 2026 Movie Management System
+    </p>
+
+    <p>
+        Built with Django
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>

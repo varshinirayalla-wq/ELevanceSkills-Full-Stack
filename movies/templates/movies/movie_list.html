@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Movie Management System</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================== */
+
+        .navbar {
+            background: #111;
+            color: white;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .nav-links a {
+            color: white;
+        }
+
+        .nav-button {
+            background: white;
+            color: #111 !important;
+            padding: 8px 14px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* =========================
+           HERO
+        ========================== */
+
+        .hero {
+            background: #181818;
+            color: white;
+            padding: 70px 8%;
+        }
+
+        .hero-content {
+            max-width: 700px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #ddd;
+        }
+
+        .hero-button {
+            display: inline-block;
+            margin-top: 15px;
+            background: white;
+            color: #111;
+            padding: 12px 22px;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        /* =========================
+           MAIN
+        ========================== */
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        .section {
+            margin-bottom: 45px;
+        }
+
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title h2 {
+            margin: 0;
+        }
+
+        /* =========================
+           MOVIE GRID
+        ========================== */
+
+        .movie-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fill, minmax(210px, 1fr));
+            gap: 22px;
+        }
+
+        .movie-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow:
+                0 8px 18px rgba(0, 0, 0, 0.14);
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            display: block;
+            background: #ddd;
+        }
+
+        .no-poster {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ddd;
+            color: #666;
+        }
+
+        .movie-content {
+            padding: 16px;
+        }
+
+        .movie-title {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .movie-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .rating {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .view-button {
+            display: inline-block;
+            margin-top: 12px;
+            background: #111;
+            color: white;
+            padding: 9px 14px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        /* =========================
+           EMPTY
+        ========================== */
+
+        .empty {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        footer {
+            background: #111;
+            color: #ccc;
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 700px) {
+
+            .hero h1 {
+                font-size: 34px;
+            }
+
+            .hero {
+                padding: 50px 6%;
+            }
+
+            .movie-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+        @media (max-width: 450px) {
+
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     NAVBAR
+========================== -->
+
+<nav class="navbar">
+
+    <a
+        href="{% url 'movie_list' %}"
+        class="brand"
+    >
+        🎬 Movie Management
+    </a>
+
+
+    <div class="nav-links">
+
+        {% if user.is_authenticated %}
+
+            <span>
+                Welcome, {{ user.username }}
+            </span>
+
+            <form
+                method="post"
+                action="{% url 'logout' %}"
+                style="display:inline;"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="nav-button"
+                >
+                    Logout
+                </button>
+
+            </form>
+
+        {% else %}
+
+            <a
+                href="{% url 'login' %}"
+                class="nav-button"
+            >
+                Login
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+
+<!-- =========================
+     HERO SECTION
+========================== -->
+
+<section class="hero">
+
+    <div class="hero-content">
+
+        <h1>
+            Discover Your Next Movie
+        </h1>
+
+        <p>
+            Explore movies, check ratings, watch trailers,
+            discover upcoming shows and share your experience
+            with verified viewer reviews.
+        </p>
+
+        <a
+            href="#movies"
+            class="hero-button"
+        >
+            Explore Movies
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     MAIN CONTENT
+========================== -->
+
+<main class="container">
+
+
+    <!-- =========================
+         RECENTLY RELEASED
+    ========================== -->
+
+    <section class="section">
+
+        <div class="section-title">
+
+            <h2>
+                Recently Released
+            </h2>
+
+        </div>
+
+
+        {% if recently_released %}
+
+            <div class="movie-grid">
+
+                {% for movie in recently_released %}
+
+                    <article class="movie-card">
+
+                        {% with poster=movie.posters.first %}
+
+                            {% if poster %}
+
+                                <img
+                                    class="movie-poster"
+                                    src="{{ poster.image_url }}"
+                                    alt="{{ poster.alt_text|default:movie.title }}"
+                                >
+
+                            {% else %}
+
+                                <div class="no-poster">
+                                    No Poster
+                                </div>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+
+                        <div class="movie-content">
+
+                            <h3 class="movie-title">
+                                {{ movie.title }}
+                            </h3>
+
+                            <div class="movie-date">
+
+                                Released:
+                                {{ movie.release_date|date:"M. d, Y" }}
+
+                            </div>
+
+                            <div class="rating">
+
+                                ⭐ {{ movie.average_rating }}/5
+
+                            </div>
+
+                            <a
+                                href="{% url 'movie_detail' movie.id %}"
+                                class="view-button"
+                            >
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+
+                No recently released movies available.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =========================
+         TRENDING
+    ========================== -->
+
+    <section class="section">
+
+        <div class="section-title">
+
+            <h2>
+                🔥 Trending Movies
+            </h2>
+
+        </div>
+
+
+        {% if trending %}
+
+            <div class="movie-grid">
+
+                {% for movie in trending %}
+
+                    <article class="movie-card">
+
+                        {% with poster=movie.posters.first %}
+
+                            {% if poster %}
+
+                                <img
+                                    class="movie-poster"
+                                    src="{{ poster.image_url }}"
+                                    alt="{{ movie.title }}"
+                                >
+
+                            {% else %}
+
+                                <div class="no-poster">
+                                    No Poster
+                                </div>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+
+                        <div class="movie-content">
+
+                            <h3 class="movie-title">
+                                {{ movie.title }}
+                            </h3>
+
+
+                            <div class="rating">
+                                ⭐ {{ movie.average_rating }}/5
+                            </div>
+
+
+                            <div class="movie-date">
+
+                                Recent bookings:
+                                {{ movie.booking_count }}
+
+                            </div>
+
+
+                            <a
+                                href="{% url 'movie_detail' movie.id %}"
+                                class="view-button"
+                            >
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+
+                No trending movies available yet.
+
+                <br><br>
+
+                Trending movies appear after users
+                make confirmed bookings.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+    <!-- =========================
+         ALL MOVIES
+    ========================== -->
+
+    <section
+        class="section"
+        id="movies"
+    >
+
+        <div class="section-title">
+
+            <h2>
+                All Movies
+            </h2>
+
+        </div>
+
+
+        {% if movies %}
+
+            <div class="movie-grid">
+
+                {% for movie in movies %}
+
+                    <article class="movie-card">
+
+                        {% with poster=movie.posters.first %}
+
+                            {% if poster %}
+
+                                <img
+                                    class="movie-poster"
+                                    src="{{ poster.image_url }}"
+                                    alt="{{ poster.alt_text|default:movie.title }}"
+                                >
+
+                            {% else %}
+
+                                <div class="no-poster">
+                                    No Poster
+                                </div>
+
+                            {% endif %}
+
+                        {% endwith %}
+
+
+                        <div class="movie-content">
+
+                            <h3 class="movie-title">
+
+                                {{ movie.title }}
+
+                            </h3>
+
+
+                            <div class="movie-date">
+
+                                Released:
+                                {{ movie.release_date|date:"M. d, Y" }}
+
+                            </div>
+
+
+                            <div class="rating">
+
+                                ⭐ {{ movie.average_rating }}/5
+
+                            </div>
+
+
+                            <a
+                                href="{% url 'movie_detail' movie.id %}"
+                                class="view-button"
+                            >
+                                View Details
+                            </a>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+
+                No movies have been added yet.
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+
+</main>
+
+
+<!-- =========================
+     FOOTER
+========================== -->
+
+<footer>
+
+    <p>
+        © 2026 Movie Management System
+    </p>
+
+    <p>
+        Built with Django
+    </p>
+
+</footer>
+
+
+</body>
+
+</html>
