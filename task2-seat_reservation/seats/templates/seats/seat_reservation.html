@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Smart Seat Reservation</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            padding: 30px;
+
+            font-family: Arial, Helvetica, sans-serif;
+
+            background: #f4f4f4;
+            color: #222;
+        }
+
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+
+            margin: 0 auto;
+        }
+
+
+        /* =========================
+           CARDS
+        ========================== */
+
+        .card {
+            background: white;
+
+            padding: 25px;
+
+            margin-bottom: 20px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 3px 12px rgba(0, 0, 0, 0.07);
+        }
+
+
+        h1 {
+            margin-top: 0;
+        }
+
+
+        h2 {
+            margin-top: 0;
+        }
+
+
+        /* =========================
+           SHOW INFORMATION
+        ========================== */
+
+        .show-info p {
+            margin: 8px 0;
+        }
+
+
+        /* =========================
+           SCREEN
+        ========================== */
+
+        .screen {
+            max-width: 650px;
+
+            margin: 25px auto;
+
+            padding: 13px;
+
+            background: #222;
+
+            color: white;
+
+            text-align: center;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* =========================
+           LEGEND
+        ========================== */
+
+        .legend {
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 18px;
+
+            margin: 20px 0;
+        }
+
+
+        .legend-item {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            font-size: 14px;
+        }
+
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+
+            border-radius: 5px;
+        }
+
+
+        .legend-available {
+            background: #d4edda;
+        }
+
+
+        .legend-reserved {
+            background: #ffeeba;
+        }
+
+
+        .legend-yours {
+            background: #b8daff;
+        }
+
+
+        .legend-booked {
+            background: #f5c6cb;
+        }
+
+
+        /* =========================
+           SEAT GRID
+        ========================== */
+
+        .seat-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(10, minmax(45px, 1fr));
+
+            gap: 10px;
+
+            width: 100%;
+
+            max-width: 750px;
+
+            margin: 0 auto 25px;
+        }
+
+
+        .seat {
+            min-height: 42px;
+
+            padding: 10px 5px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            user-select: none;
+        }
+
+
+        /* =========================
+           AVAILABLE SEAT
+        ========================== */
+
+        .available-seat {
+            background: #d4edda;
+
+            cursor: pointer;
+        }
+
+
+        .available-seat:hover {
+            background: #b9dfc1;
+        }
+
+
+        /* =========================
+           YOUR RESERVED SEAT
+        ========================== */
+
+        .your-seat {
+            background: #b8daff;
+
+            color: #004085;
+
+            cursor: pointer;
+        }
+
+
+        .your-seat:hover {
+            background: #9fcaf2;
+        }
+
+
+        /* =========================
+           RESERVED BY OTHER USER
+        ========================== */
+
+        .reserved-seat {
+            background: #ffeeba;
+
+            color: #856404;
+        }
+
+
+        /* =========================
+           BOOKED SEAT
+        ========================== */
+
+        .booked-seat {
+            background: #f5c6cb;
+
+            color: #721c24;
+        }
+
+
+        /* =========================
+           SELECTED STATE
+        ========================== */
+
+        .seat.selected {
+            outline: 3px solid #111;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* =========================
+           HIDDEN CHECKBOX
+        ========================== */
+
+        .seat input {
+            display: none;
+        }
+
+
+        /* =========================
+           BUTTONS
+        ========================== */
+
+        .button {
+            display: inline-block;
+
+            padding: 11px 18px;
+
+            border: none;
+
+            border-radius: 6px;
+
+            background: #111;
+
+            color: white;
+
+            font-size: 14px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            text-decoration: none;
+        }
+
+
+        .button:hover {
+            background: #333;
+        }
+
+
+        .button:disabled {
+            background: #888;
+
+            cursor: not-allowed;
+        }
+
+
+        /* =========================
+           ACTION AREA
+        ========================== */
+
+        .actions {
+            margin-top: 20px;
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+        }
+
+
+        /* =========================
+           MESSAGES
+        ========================== */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+
+        .message {
+            padding: 12px 15px;
+
+            margin-bottom: 10px;
+
+            border-radius: 6px;
+
+            background: #e2e3e5;
+        }
+
+
+        /* =========================
+           TIMER
+        ========================== */
+
+        .reservation-box {
+            border-left: 5px solid #111;
+        }
+
+
+        .timer {
+            margin: 15px 0;
+
+            font-size: 28px;
+
+            font-weight: bold;
+        }
+
+
+        .timer.warning {
+            color: #b00020;
+        }
+
+
+        .reserved-seats {
+            font-weight: 600;
+        }
+
+
+        /* =========================
+           SUMMARY
+        ========================== */
+
+        .selection-summary {
+            padding: 15px;
+
+            margin-top: 20px;
+
+            background: #f7f7f7;
+
+            border-radius: 7px;
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 750px) {
+
+            body {
+                padding: 15px;
+            }
+
+
+            .container {
+                width: 100%;
+            }
+
+
+            .seat-grid {
+                grid-template-columns:
+                    repeat(5, minmax(40px, 1fr));
+
+                gap: 8px;
+            }
+
+
+            .seat {
+                min-height: 40px;
+
+                font-size: 13px;
+            }
+
+
+            .legend {
+                gap: 12px;
+            }
+
+        }
+
+
+        @media (max-width: 450px) {
+
+            .seat-grid {
+                grid-template-columns:
+                    repeat(5, minmax(35px, 1fr));
+            }
+
+
+            .seat {
+                padding: 8px 2px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================================
+         SHOW DETAILS
+    ========================================== -->
+
+    <div class="card show-info">
+
+        <h1>
+            {{ show.movie_name }}
+        </h1>
+
+
+        <p>
+
+            <strong>
+                Theater:
+            </strong>
+
+            {{ show.theater_name }}
+
+        </p>
+
+
+        <p>
+
+            <strong>
+                Show Time:
+            </strong>
+
+            {{ show.show_time }}
+
+        </p>
+
+
+        <p>
+
+            <strong>
+                Ticket Price:
+            </strong>
+
+            ₹{{ show.ticket_price }}
+
+        </p>
+
+
+    </div>
+
+
+
+    <!-- =========================================
+         DJANGO MESSAGES
+    ========================================== -->
+
+    {% if messages %}
+
+        <div class="messages">
+
+            {% for message in messages %}
+
+                <div class="message">
+
+                    {{ message }}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- =========================================
+         SEAT SELECTION
+    ========================================== -->
+
+    <div class="card">
+
+        <h2>
+            Select Your Seats
+        </h2>
+
+
+        <!-- LEGEND -->
+
+        <div class="legend">
+
+
+            <div class="legend-item">
+
+                <span
+                    class="legend-box legend-available">
+                </span>
+
+                Available
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span
+                    class="legend-box legend-reserved">
+                </span>
+
+                Reserved
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span
+                    class="legend-box legend-yours">
+                </span>
+
+                Your Reservation
+
+            </div>
+
+
+            <div class="legend-item">
+
+                <span
+                    class="legend-box legend-booked">
+                </span>
+
+                Booked
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- SCREEN -->
+
+        <div class="screen">
+
+            SCREEN
+
+        </div>
+
+
+
+        <!-- =====================================
+             SEAT FORM
+        ====================================== -->
+
+        <form
+            method="post"
+            id="seatForm"
+            action="{% if current_reservations %}{% url 'modify_seats' show.id %}{% else %}{% url 'reserve_seats' show.id %}{% endif %}"
+        >
+
+            {% csrf_token %}
+
+
+            <!-- SEAT GRID -->
+
+            <div class="seat-grid">
+
+
+                {% for seat, status in seat_status.items %}
+
+
+                    <!-- AVAILABLE -->
+
+                    {% if status == "available" %}
+
+                        <label
+                            class="seat available-seat"
+                            id="seat-{{ seat }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="seats"
+                                value="{{ seat }}"
+                            >
+
+                            {{ seat }}
+
+                        </label>
+
+
+                    <!-- YOUR CURRENT RESERVATION -->
+
+                    {% elif status == "your_reservation" %}
+
+                        <label
+                            class="seat your-seat selected"
+                            id="seat-{{ seat }}"
+                        >
+
+                            <input
+                                type="checkbox"
+                                name="seats"
+                                value="{{ seat }}"
+                                checked
+                            >
+
+                            {{ seat }}
+
+                        </label>
+
+
+                    <!-- RESERVED BY SOMEONE ELSE -->
+
+                    {% elif status == "reserved" %}
+
+                        <div
+                            class="seat reserved-seat"
+                            id="seat-{{ seat }}"
+                        >
+
+                            {{ seat }}
+
+                        </div>
+
+
+                    <!-- BOOKED -->
+
+                    {% elif status == "booked" %}
+
+                        <div
+                            class="seat booked-seat"
+                            id="seat-{{ seat }}"
+                        >
+
+                            {{ seat }}
+
+                        </div>
+
+
+                    {% endif %}
+
+
+                {% endfor %}
+
+
+            </div>
+
+
+
+            <!-- SELECTED COUNT -->
+
+            <div class="selection-summary">
+
+                Selected Seats:
+
+                <strong id="selectedCount">
+                    0
+                </strong>
+
+            </div>
+
+
+
+            <!-- MAIN ACTION -->
+
+            <div class="actions">
+
+                <button
+                    type="submit"
+                    class="button"
+                    id="selectionButton"
+                >
+
+                    {% if current_reservations %}
+
+                        Update Seat Selection
+
+                    {% else %}
+
+                        Reserve Selected Seats
+
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+
+
+    <!-- =========================================
+         CURRENT RESERVATION
+    ========================================== -->
+
+    {% if current_reservations %}
+
+        <div
+            class="card reservation-box"
+            id="reservationCard"
+            data-remaining-seconds="{{ current_reservations.0.remaining_seconds }}"
+        >
+
+
+            <h2>
+                Your Current Reservation
+            </h2>
+
+
+            <p>
+                Your selected seats are temporarily reserved.
+            </p>
+
+
+
+            <!-- TIMER -->
+
+            <div class="timer">
+
+                Time Remaining:
+
+                <span id="timer">
+                    02:00
+                </span>
+
+            </div>
+
+
+
+            <!-- RESERVED SEATS -->
+
+            <p class="reserved-seats">
+
+                Reserved Seats:
+
+                {% for reservation in current_reservations %}
+
+                    <span>
+                        {{ reservation.seat_number }}
+                    </span>
+
+                    {% if not forloop.last %}
+                        ,
+                    {% endif %}
+
+                {% endfor %}
+
+            </p>
+
+
+
+            <!-- PAYMENT -->
+
+            <form
+                method="post"
+                action="{% url 'complete_payment' show.id %}"
+            >
+
+                {% csrf_token %}
+
+
+                <button
+                    type="submit"
+                    class="button"
+                >
+                    Complete Payment
+                </button>
+
+            </form>
+
+
+        </div>
+
+    {% endif %}
+
+
+
+</div>
+
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================== -->
+
+<script>
+
+
+    /*
+     * Find every selectable seat.
+     */
+
+    const checkboxes =
+        document.querySelectorAll(
+            '#seatForm input[type="checkbox"]'
+        );
+
+
+    /*
+     * Count selected seats and add/remove
+     * the visual selected state.
+     */
+
+    function updateSelectionCount() {
+
+        const checked =
+            document.querySelectorAll(
+                '#seatForm input[type="checkbox"]:checked'
+            );
+
+
+        const selectedCount =
+            document.getElementById(
+                "selectedCount"
+            );
+
+
+        if (selectedCount) {
+
+            selectedCount.textContent =
+                checked.length;
+
+        }
+
+    }
+
+
+    /*
+     * Seat click handling.
+     */
+
+    checkboxes.forEach(
+        function (checkbox) {
+
+            checkbox.addEventListener(
+                "change",
+                function () {
+
+                    const label =
+                        checkbox.parentElement;
+
+
+                    if (checkbox.checked) {
+
+                        label.classList.add(
+                            "selected"
+                        );
+
+                    } else {
+
+                        label.classList.remove(
+                            "selected"
+                        );
+
+                    }
+
+
+                    updateSelectionCount();
+
+                }
+            );
+
+        }
+    );
+
+
+    /*
+     * Set initial selected count.
+     */
+
+    updateSelectionCount();
+
+
+
+    /*
+     * Reservation timer.
+     *
+     * The remaining time is placed in a
+     * data attribute by Django, so the
+     * JavaScript itself contains no Django
+     * template syntax.
+     */
+
+    const reservationCard =
+        document.getElementById(
+            "reservationCard"
+        );
+
+
+    if (reservationCard) {
+
+
+        let seconds =
+            parseInt(
+                reservationCard.dataset.remainingSeconds,
+                10
+            );
+
+
+        const timer =
+            document.getElementById(
+                "timer"
+            );
+
+
+        function updateTimer() {
+
+
+            if (seconds <= 0) {
+
+                timer.textContent =
+                    "00:00";
+
+
+                timer.classList.add(
+                    "warning"
+                );
+
+
+                alert(
+                    "Your reservation has expired."
+                );
+
+
+                window.location.reload();
+
+                return;
+
+            }
+
+
+            const minutes =
+                Math.floor(
+                    seconds / 60
+                );
+
+
+            const remainingSeconds =
+                seconds % 60;
+
+
+            timer.textContent =
+                String(minutes).padStart(
+                    2,
+                    "0"
+                )
+                + ":"
+                + String(
+                    remainingSeconds
+                ).padStart(
+                    2,
+                    "0"
+                );
+
+
+            /*
+             * Warn the user when less than
+             * 30 seconds remain.
+             */
+
+            if (seconds <= 30) {
+
+                timer.classList.add(
+                    "warning"
+                );
+
+            }
+
+
+            seconds--;
+
+        }
+
+
+        updateTimer();
+
+
+        setInterval(
+            updateTimer,
+            1000
+        );
+
+    }
+
+</script>
+
+
+</body>
+
+</html>
