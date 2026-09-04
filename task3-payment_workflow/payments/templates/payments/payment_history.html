@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Payment History</title>
+
+</head>
+
+<body>
+
+<div style="
+    max-width:1000px;
+    margin:40px auto;
+    font-family:Arial;
+">
+
+    <h1>
+        My Payment & Booking History
+    </h1>
+
+
+    <h2>
+        Payments
+    </h2>
+
+
+    {% for payment in payments %}
+
+        <div style="
+            border:1px solid #ddd;
+            padding:20px;
+            margin-bottom:15px;
+        ">
+
+            <p>
+                <strong>
+                    Order ID:
+                </strong>
+
+                {{ payment.order_id }}
+            </p>
+
+            <p>
+                <strong>
+                    Movie:
+                </strong>
+
+                {{ payment.show.movie_name }}
+            </p>
+
+            <p>
+                <strong>
+                    Amount:
+                </strong>
+
+                ₹{{ payment.amount }}
+            </p>
+
+            <p>
+                <strong>
+                    Seats:
+                </strong>
+
+                {{ payment.selected_seats|join:", " }}
+            </p>
+
+            <p>
+                <strong>
+                    Status:
+                </strong>
+
+                {{ payment.status }}
+            </p>
+
+            {% if payment.transaction_id %}
+
+                <p>
+                    <strong>
+                        Transaction ID:
+                    </strong>
+
+                    {{ payment.transaction_id }}
+                </p>
+
+            {% endif %}
+
+            <p>
+                {{ payment.created_at }}
+            </p>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            No payment records yet.
+        </p>
+
+    {% endfor %}
+
+
+    <h2>
+        Confirmed Bookings
+    </h2>
+
+
+    {% for booking in bookings %}
+
+        <div style="
+            border:1px solid #ddd;
+            padding:20px;
+            margin-bottom:15px;
+        ">
+
+            <h3>
+                {{ booking.show.movie_name }}
+            </h3>
+
+            <p>
+                Theater:
+                {{ booking.show.theater_name }}
+            </p>
+
+            <p>
+                Seats:
+                {{ booking.seats|join:", " }}
+            </p>
+
+            <p>
+                Amount:
+                ₹{{ booking.amount }}
+            </p>
+
+            <p>
+                Status:
+                {{ booking.status }}
+            </p>
+
+            <p>
+                Transaction:
+                {{ booking.payment.transaction_id }}
+            </p>
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            No confirmed bookings yet.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+</body>
+
+</html>

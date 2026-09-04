@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Payment Result</title>
+
+</head>
+
+<body>
+
+<div style="
+    max-width:700px;
+    margin:60px auto;
+    font-family:Arial;
+">
+
+    {% if payment.status == "SUCCESS" %}
+
+        <h1>
+            Payment Successful
+        </h1>
+
+        <p>
+            Your payment has been verified successfully.
+        </p>
+
+        <p>
+            Transaction ID:
+            {{ payment.transaction_id }}
+        </p>
+
+        {% if booking %}
+
+            <h2>
+                Booking Confirmed
+            </h2>
+
+            <p>
+                Movie:
+                {{ booking.show.movie_name }}
+            </p>
+
+            <p>
+                Seats:
+                {{ booking.seats|join:", " }}
+            </p>
+
+        {% endif %}
+
+    {% elif payment.status == "FAILED" %}
+
+        <h1>
+            Payment Failed
+        </h1>
+
+        <p>
+            {{ payment.failure_reason }}
+        </p>
+
+        <a
+            href="{% url 'payment_retry' payment.id %}"
+        >
+            Retry Payment
+        </a>
+
+    {% elif payment.status == "CANCELLED" %}
+
+        <h1>
+            Payment Cancelled
+        </h1>
+
+        <p>
+            Your payment was cancelled.
+            The temporarily held seats were released.
+        </p>
+
+        <a href="{% url 'home' %}">
+            Try Again
+        </a>
+
+    {% else %}
+
+        <h1>
+            Payment Pending
+        </h1>
+
+        <p>
+            The payment is still being processed.
+        </p>
+
+    {% endif %}
+
+    <br><br>
+
+    <a href="{% url 'payment_history' %}">
+        View Payment History
+    </a>
+
+</div>
+
+</body>
+
+</html>

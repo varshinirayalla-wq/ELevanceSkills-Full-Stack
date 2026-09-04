@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Razorpay Checkout</title>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+</head>
+
+
+<body>
+
+<div style="max-width:600px;margin:60px auto;font-family:Arial;">
+
+    <h1>
+        Confirm Payment
+    </h1>
+
+    <p>
+        Movie:
+        {{ payment.show.movie_name }}
+    </p>
+
+    <p>
+        Seats:
+        {{ payment.selected_seats|join:", " }}
+    </p>
+
+    <p>
+        Amount:
+        ₹{{ payment.amount }}
+    </p>
+
+
+    <button
+        id="pay-button"
+        style="
+            padding:12px 20px;
+            background:#111;
+            color:#fff;
+            border:0;
+            border-radius:5px;
+            cursor:pointer;
+        "
+    >
+        Pay Now
+    </button>
+
+</div>
+
+
+<form
+    id="success-form"
+    method="post"
+    action="{% url 'payment_success' %}"
+    style="display:none;"
+>
+
+    {% csrf_token %}
+
+    <input
+        type="hidden"
+        name="razorpay_order_id"
+        id="success-order-id"
+    >
+
+    <input
+        type="hidden"
+        name="razorpay_payment_id"
+        id="success-payment-id"
+    >
+
+    <input
+        type="hidden"
+        name="razorpay_signature"
+        id="success-signature"
+    >
+
+</form>
+
+
+<form
+    id="failed-form"
+    method="post"
+    action="{% url 'payment_failed' %}"
+    style="display:none;"
+>
+
+    {% csrf_token %}
+
+    <input
+        type="hidden"
+        name="order_id"
+        value="{{ payment.order_id }}"
+    >
+
+    <input
+        type="hidden"
+        name="reason"
+        id="failure-reason"
+    >
+
+</form>
+
+
+<script>
+
+    const options = {
+
+        key: "{{ razorpay_key }}",
+
+        amount: "{{ amount_paise }}",
+
+        currency: "{{ payment.currency }}",
+
+        name: "Movie Payment System",
+
+        description:
+            "{{ payment.show.movie_name }} ticket payment",
+
+        order_id:
+            "{{ payment.order_id }}",
+
+        handler:
+            function (response) {
+
+                document.getElementById(
+                    "success-order-id"
+                ).value =
+                    response.razorpay_order_id;
+
+                document.getElementById(
+                    "success-payment-id"
+                ).value =
+                    response.razorpay_payment_id;
+
+                document.getElementById(
+                    "success-signature"
+                ).value =
+                    response.razorpay_signature;
+
+                document.getElementById(
+                    "success-form"
+                ).submit();
+
+            },
+
+        modal: {
+
+            ondismiss:
+                function () {
+
+                    document.getElementById(
+                        "failure-reason"
+                    ).value =
+                        "Customer cancelled payment.";
+
+                    document.getElementById(
+                        "failed-form"
+                    ).submit();
+
+                }
+
+        },
+
+        theme: {
+            color: "#111111"
+        }
+
+    };
+
+
+    const razorpay =
+        new Razorpay(options);
+
+
+    razorpay.on(
+        "payment.failed",
+        function (response) {
+
+            document.getElementById(
+                "failure-reason"
+            ).value =
+                response.error.description
+                || "Payment failed.";
+
+            document.getElementById(
+                "failed-form"
+            ).submit();
+
+        }
+    );
+
+
+    document.getElementById(
+        "pay-button"
+    ).onclick = function () {
+
+        razorpay.open();
+
+    };
+
+</script>
+
+</body>
+
+</html>

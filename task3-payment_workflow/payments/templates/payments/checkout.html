@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Payment Workflow</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            background: #f4f4f4;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        select,
+        button {
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            background: #111;
+            color: white;
+            border: 0;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .user-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="user-bar">
+
+        <div>
+            {% if user.is_authenticated %}
+                Welcome, {{ user.username }}
+            {% else %}
+                <a href="{% url 'login' %}">
+                    Login
+                </a>
+            {% endif %}
+        </div>
+
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'payment_history' %}">
+                    Payment History
+                </a>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h1>
+            Complete Payment Workflow
+        </h1>
+
+        {% if not user.is_authenticated %}
+
+            <p>
+                Please log in before making a payment.
+            </p>
+
+            <a href="{% url 'login' %}">
+                Login
+            </a>
+
+        {% else %}
+
+            {% for show in shows %}
+
+                <div class="card">
+
+                    <h2>
+                        {{ show.movie_name }}
+                    </h2>
+
+                    <p>
+                        Theater:
+                        {{ show.theater_name }}
+                    </p>
+
+                    <p>
+                        Show Time:
+                        {{ show.show_time }}
+                    </p>
+
+                    <p>
+                        Ticket Price:
+                        ₹{{ show.ticket_price }}
+                    </p>
+
+                    <form
+                        method="post"
+                        action="{% url 'create_order' show.id %}"
+                        class="payment-form"
+                    >
+
+                        {% csrf_token %}
+
+                        <p>
+                            Select seats:
+                        </p>
+
+                        {% for seat in show.seats.all %}
+
+                            {% if seat.status == "AVAILABLE" %}
+
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        name="seats"
+                                        value="{{ seat.seat_number }}"
+                                    >
+
+                                    Seat {{ seat.seat_number }}
+
+                                </label>
+
+                                <br>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                        <br>
+
+                        <button type="submit">
+                            Continue to Payment
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% empty %}
+
+                <p>
+                    No shows available.
+                </p>
+
+            {% endfor %}
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
