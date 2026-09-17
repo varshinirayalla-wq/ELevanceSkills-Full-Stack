@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Admin Analytics Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f9;
+            color: #1f2937;
+        }
+
+        .topbar {
+            background: #111827;
+            color: white;
+            padding: 20px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 25px;
+        }
+
+        .brand p {
+            margin: 5px 0 0;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        .logout-button {
+            background: transparent;
+            color: white;
+            border: 1px solid #6b7280;
+            border-radius: 7px;
+            padding: 9px 15px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-button:hover {
+            background: #1f2937;
+        }
+
+        .container {
+            max-width: 1450px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .message {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        /* FILTERS */
+
+        .filter-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .filter-title {
+            margin: 0 0 15px;
+            font-size: 18px;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 14px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #4b5563;
+        }
+
+        .field input {
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            min-width: 160px;
+            background: white;
+        }
+
+        .button {
+            padding: 10px 16px;
+            border-radius: 7px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .primary {
+            background: #111827;
+            color: white;
+        }
+
+        .secondary {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .success {
+            background: #166534;
+            color: white;
+        }
+
+        .primary:hover,
+        .success:hover {
+            opacity: 0.9;
+        }
+
+        /* KPI CARDS */
+
+        .section-label {
+            font-size: 18px;
+            margin: 5px 0 14px;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 21px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-title {
+            font-size: 13px;
+            color: #6b7280;
+            margin-bottom: 9px;
+            font-weight: 600;
+        }
+
+        .card-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #111827;
+            word-break: break-word;
+        }
+
+        .card-subtitle {
+            margin-top: 8px;
+            color: #9ca3af;
+            font-size: 12px;
+        }
+
+        /* GRID */
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .wide {
+            grid-column: 1 / -1;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            min-width: 0;
+        }
+
+        .section h2 {
+            margin: 0 0 18px;
+            font-size: 19px;
+        }
+
+        .section-description {
+            margin-top: -10px;
+            margin-bottom: 18px;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 320px;
+        }
+
+        .chart-box.large {
+            height: 360px;
+        }
+
+        /* TABLES */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 11px;
+            border-bottom: 1px solid #edf0f2;
+            text-align: left;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #6b7280;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* STAT BOXES */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .stat-box {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 9px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        /* INFO */
+
+        .footer-note {
+            background: white;
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            color: #6b7280;
+            font-size: 13px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1050px) {
+
+            .cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .wide {
+                grid-column: auto;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .topbar {
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .container {
+                padding: 0 12px;
+                margin-top: 20px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .field input {
+                width: 100%;
+            }
+
+            .button {
+                text-align: center;
+                width: 100%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <h1>
+            Admin Analytics Dashboard
+        </h1>
+
+        <p>
+            Movie booking business intelligence
+        </p>
+
+    </div>
+
+
+    <form
+        method="post"
+        action="{% url 'logout' %}"
+    >
+
+        {% csrf_token %}
+
+        <button
+            type="submit"
+            class="logout-button"
+        >
+            Logout
+        </button>
+
+    </form>
+
+</header>
+
+
+<main class="container">
+
+
+    <!-- =========================
+         MESSAGES
+    ========================= -->
+
+    {% if messages %}
+
+        {% for message in messages %}
+
+            <div class="message">
+                {{ message }}
+            </div>
+
+        {% endfor %}
+
+    {% endif %}
+
+
+    <!-- =========================
+         DATE FILTER
+    ========================= -->
+
+    <section class="filter-card">
+
+        <h2 class="filter-title">
+            Report Filters
+        </h2>
+
+        <form
+            method="get"
+            class="filter-form"
+        >
+
+            <div class="field">
+
+                <label for="start_date">
+                    Start Date
+                </label>
+
+                <input
+                    id="start_date"
+                    type="date"
+                    name="start_date"
+                    value="{{ start_date }}"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label for="end_date">
+                    End Date
+                </label>
+
+                <input
+                    id="end_date"
+                    type="date"
+                    name="end_date"
+                    value="{{ end_date }}"
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="button primary"
+            >
+                Apply Filter
+            </button>
+
+
+            <a
+                href="{% url 'dashboard_home' %}"
+                class="button secondary"
+            >
+                Reset
+            </a>
+
+
+            <a
+                href="{% url 'export_csv' %}?start_date={{ start_date }}&end_date={{ end_date }}"
+                class="button success"
+            >
+                Export CSV
+            </a>
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================
+         REVENUE PERIOD CARDS
+    ========================= -->
+
+    <h2 class="section-label">
+        Revenue Overview
+    </h2>
+
+
+    <div class="cards">
+
+        <div class="card">
+
+            <div class="card-title">
+                Daily Revenue
+            </div>
+
+            <div class="card-value">
+                ₹{{ revenue_windows.daily|floatformat:2 }}
+            </div>
+
+            <div class="card-subtitle">
+
+                {{ revenue_windows.reference_date|date:"d M Y" }}
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Weekly Revenue
+            </div>
+
+            <div class="card-value">
+                ₹{{ revenue_windows.weekly|floatformat:2 }}
+            </div>
+
+            <div class="card-subtitle">
+
+                Week containing
+                {{ revenue_windows.reference_date|date:"d M Y" }}
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Monthly Revenue
+            </div>
+
+            <div class="card-value">
+                ₹{{ revenue_windows.monthly|floatformat:2 }}
+            </div>
+
+            <div class="card-subtitle">
+
+                Month containing
+                {{ revenue_windows.reference_date|date:"d M Y" }}
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Yearly Revenue
+            </div>
+
+            <div class="card-value">
+                ₹{{ revenue_windows.yearly|floatformat:2 }}
+            </div>
+
+            <div class="card-subtitle">
+
+                Year containing
+                {{ revenue_windows.reference_date|date:"d M Y" }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         SELECTED RANGE KPIs
+    ========================= -->
+
+    <div class="cards">
+
+        <div class="card">
+
+            <div class="card-title">
+                Selected Range Revenue
+            </div>
+
+            <div class="card-value">
+                ₹{{ summary.total_revenue|floatformat:2 }}
+            </div>
+
+            <div class="card-subtitle">
+                Confirmed bookings only
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Confirmed Bookings
+            </div>
+
+            <div class="card-value">
+                {{ summary.total_bookings }}
+            </div>
+
+            <div class="card-subtitle">
+                Selected date range
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Seats Booked
+            </div>
+
+            <div class="card-value">
+                {{ summary.total_seats }}
+            </div>
+
+            <div class="card-subtitle">
+                Confirmed seats
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-title">
+                Cancellation Rate
+            </div>
+
+            <div class="card-value">
+                {{ cancellation_stats.cancellation_percentage }}%
+            </div>
+
+            <div class="card-subtitle">
+                All bookings in selected range
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         REVENUE TREND
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section wide">
+
+            <h2>
+                Monthly Revenue Trend
+            </h2>
+
+            <p class="section-description">
+                Confirmed booking revenue across the selected period.
+            </p>
+
+            <div class="chart-box large">
+
+                <canvas id="monthlyRevenueChart"></canvas>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         BOOKING TRENDS
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section">
+
+            <h2>
+                Booking Trends
+            </h2>
+
+            <p class="section-description">
+                Confirmed versus cancelled bookings over time.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="bookingTrendChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <section class="section">
+
+            <h2>
+                Theater Occupancy
+            </h2>
+
+            <p class="section-description">
+                Confirmed seat utilization by theater.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="occupancyChart"></canvas>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         MOVIE + THEATER
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section">
+
+            <h2>
+                Most Booked Movies
+            </h2>
+
+            <p class="section-description">
+                Top movies ranked by confirmed bookings.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="movieChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <section class="section">
+
+            <h2>
+                Top Performing Theaters
+            </h2>
+
+            <p class="section-description">
+                Theaters ranked by confirmed booking revenue.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="theaterChart"></canvas>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         PEAK HOURS + USERS
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section">
+
+            <h2>
+                Peak Booking Hours
+            </h2>
+
+            <p class="section-description">
+                Booking distribution across the 24-hour day.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="peakHourChart"></canvas>
+
+            </div>
+
+        </section>
+
+
+        <section class="section">
+
+            <h2>
+                User Growth
+            </h2>
+
+            <p class="section-description">
+                New users grouped by month.
+            </p>
+
+            <div class="chart-box">
+
+                <canvas id="userGrowthChart"></canvas>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         THEATER TABLE
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section">
+
+            <h2>
+                Theater Performance
+            </h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Theater
+                            </th>
+
+                            <th>
+                                Bookings
+                            </th>
+
+                            <th>
+                                Seats
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for row in top_theaters %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row.theater__name }}
+                                </td>
+
+                                <td>
+                                    {{ row.booking_count }}
+                                </td>
+
+                                <td>
+                                    {{ row.seats_booked }}
+                                </td>
+
+                                <td>
+                                    ₹{{ row.revenue|floatformat:2 }}
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td colspan="4">
+                                    No theater data available.
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MOVIE TABLE
+        ========================= -->
+
+        <section class="section">
+
+            <h2>
+                Movie Performance
+            </h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Movie
+                            </th>
+
+                            <th>
+                                Bookings
+                            </th>
+
+                            <th>
+                                Seats
+                            </th>
+
+                            <th>
+                                Revenue
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for row in most_booked_movies %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row.movie__name }}
+                                </td>
+
+                                <td>
+                                    {{ row.booking_count }}
+                                </td>
+
+                                <td>
+                                    {{ row.seats_booked }}
+                                </td>
+
+                                <td>
+                                    ₹{{ row.revenue|floatformat:2 }}
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td colspan="4">
+                                    No movie data available.
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         OCCUPANCY DETAILS
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section wide">
+
+            <h2>
+                Theater Occupancy Details
+            </h2>
+
+            <div class="table-wrapper">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Theater
+                            </th>
+
+                            <th>
+                                Booked Seats
+                            </th>
+
+                            <th>
+                                Capacity
+                            </th>
+
+                            <th>
+                                Occupancy
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for row in theater_occupancy %}
+
+                            <tr>
+
+                                <td>
+                                    {{ row.theater__name }}
+                                </td>
+
+                                <td>
+                                    {{ row.booked_seats }}
+                                </td>
+
+                                <td>
+                                    {{ row.total_capacity }}
+                                </td>
+
+                                <td>
+                                    {{ row.occupancy_percentage }}%
+                                </td>
+
+                            </tr>
+
+                        {% empty %}
+
+                            <tr>
+
+                                <td colspan="4">
+                                    No occupancy data available.
+                                </td>
+
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         CANCELLATION + REFUNDS
+    ========================= -->
+
+    <div class="grid">
+
+        <section class="section">
+
+            <h2>
+                Cancellation Statistics
+            </h2>
+
+            <div class="stats">
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Total Bookings
+                    </div>
+
+                    <div class="stat-value">
+                        {{ cancellation_stats.total_bookings }}
+                    </div>
+
+                </div>
+
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Cancelled
+                    </div>
+
+                    <div class="stat-value">
+                        {{ cancellation_stats.cancelled_bookings }}
+                    </div>
+
+                </div>
+
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Cancellation Rate
+                    </div>
+
+                    <div class="stat-value">
+                        {{ cancellation_stats.cancellation_percentage }}%
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="section">
+
+            <h2>
+                Refund Statistics
+            </h2>
+
+            <div class="stats">
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Refund Count
+                    </div>
+
+                    <div class="stat-value">
+                        {{ refund_stats.refund_count }}
+                    </div>
+
+                </div>
+
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Refund Amount
+                    </div>
+
+                    <div class="stat-value">
+                        ₹{{ refund_stats.refund_amount|floatformat:2 }}
+                    </div>
+
+                </div>
+
+
+                <div class="stat-box">
+
+                    <div class="stat-label">
+                        Dataset
+                    </div>
+
+                    <div class="stat-value">
+                        120K+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+
+    <!-- =========================
+         FOOTER NOTE
+    ========================= -->
+
+    <div class="footer-note">
+
+        Dashboard analytics are calculated using
+        database-side Django ORM aggregation,
+        filtering and indexed queries.
+
+    </div>
+
+
+</main>
+
+
+<!-- =========================
+     JSON DATA FOR CHARTS
+========================= -->
+
+{{ monthly_chart|json_script:"monthlyChartData" }}
+
+{{ daily_chart|json_script:"dailyChartData" }}
+
+{{ occupancy_chart|json_script:"occupancyChartData" }}
+
+{{ movie_chart|json_script:"movieChartData" }}
+
+{{ theater_chart|json_script:"theaterChartData" }}
+
+{{ peak_chart|json_script:"peakChartData" }}
+
+{{ user_growth_chart|json_script:"userGrowthChartData" }}
+
+
+<script>
+
+    /*
+     * Read chart data generated by Django.
+     */
+
+    const monthlyData = JSON.parse(
+        document.getElementById(
+            "monthlyChartData"
+        ).textContent
+    );
+
+
+    const dailyData = JSON.parse(
+        document.getElementById(
+            "dailyChartData"
+        ).textContent
+    );
+
+
+    const occupancyData = JSON.parse(
+        document.getElementById(
+            "occupancyChartData"
+        ).textContent
+    );
+
+
+    const movieData = JSON.parse(
+        document.getElementById(
+            "movieChartData"
+        ).textContent
+    );
+
+
+    const theaterData = JSON.parse(
+        document.getElementById(
+            "theaterChartData"
+        ).textContent
+    );
+
+
+    const peakData = JSON.parse(
+        document.getElementById(
+            "peakChartData"
+        ).textContent
+    );
+
+
+    const userGrowthData = JSON.parse(
+        document.getElementById(
+            "userGrowthChartData"
+        ).textContent
+    );
+
+
+    /*
+     * MONTHLY REVENUE
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "monthlyRevenueChart"
+        ),
+
+        {
+            type: "line",
+
+            data: {
+
+                labels: monthlyData.labels,
+
+                datasets: [
+                    {
+                        label: "Revenue (₹)",
+
+                        data: monthlyData.revenue,
+
+                        tension: 0.3,
+
+                        fill: false,
+
+                        borderWidth: 2,
+
+                        pointRadius: 3
+                    }
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: true
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+                                    "₹" +
+                                    Number(
+                                        context.parsed.y
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    )
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return "₹" +
+                                    Number(
+                                        value
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * BOOKING TRENDS
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "bookingTrendChart"
+        ),
+
+        {
+            type: "line",
+
+            data: {
+
+                labels: dailyData.labels,
+
+                datasets: [
+
+                    {
+                        label: "Confirmed",
+
+                        data: dailyData.confirmed,
+
+                        tension: 0.3,
+
+                        fill: false,
+
+                        borderWidth: 2
+                    },
+
+                    {
+                        label: "Cancelled",
+
+                        data: dailyData.cancelled,
+
+                        tension: 0.3,
+
+                        fill: false,
+
+                        borderWidth: 2
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: "index"
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * THEATER OCCUPANCY
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "occupancyChart"
+        ),
+
+        {
+            type: "bar",
+
+            data: {
+
+                labels: occupancyData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: "Occupancy %",
+
+                        data: occupancyData.values,
+
+                        borderWidth: 1
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback: function(value) {
+                                return value + "%";
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                plugins: {
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return (
+                                    "Occupancy: " +
+                                    context.parsed.y +
+                                    "%"
+                                );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * MOST BOOKED MOVIES
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "movieChart"
+        ),
+
+        {
+            type: "bar",
+
+            data: {
+
+                labels: movieData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: "Bookings",
+
+                        data: movieData.values,
+
+                        borderWidth: 1
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                indexAxis: "y",
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    x: {
+                        beginAtZero: true
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * TOP THEATERS
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "theaterChart"
+        ),
+
+        {
+            type: "bar",
+
+            data: {
+
+                labels: theaterData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: "Revenue (₹)",
+
+                        data: theaterData.values,
+
+                        borderWidth: 1
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return "₹" +
+                                    Number(
+                                        value
+                                    ).toLocaleString(
+                                        "en-IN"
+                                    );
+
+                            }
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * PEAK BOOKING HOURS
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "peakHourChart"
+        ),
+
+        {
+            type: "line",
+
+            data: {
+
+                labels: peakData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: "Bookings",
+
+                        data: peakData.values,
+
+                        tension: 0.3,
+
+                        fill: false,
+
+                        borderWidth: 2,
+
+                        pointRadius: 3
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+
+    /*
+     * USER GROWTH
+     */
+
+    new Chart(
+
+        document.getElementById(
+            "userGrowthChart"
+        ),
+
+        {
+            type: "line",
+
+            data: {
+
+                labels: userGrowthData.labels,
+
+                datasets: [
+
+                    {
+
+                        label: "New Users",
+
+                        data: userGrowthData.values,
+
+                        tension: 0.3,
+
+                        fill: false,
+
+                        borderWidth: 2,
+
+                        pointRadius: 3
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    }
+
+                }
+
+            }
+
+        }
+
+    );
+
+</script>
+
+
+</body>
+
+</html>
