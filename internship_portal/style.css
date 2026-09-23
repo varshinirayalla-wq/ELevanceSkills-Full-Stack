@@ -1,0 +1,153 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+    line-height: 1.6;
+}
+
+.hero {
+    background: linear-gradient(135deg, #111827, #1f3a5f);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.container {
+    width: min(1150px, 92%);
+    margin: auto;
+}
+
+.tag {
+    font-size: 14px;
+    letter-spacing: 2px;
+    font-weight: bold;
+    margin-bottom: 14px;
+    opacity: 0.85;
+}
+
+.hero h1 {
+    font-size: clamp(36px, 6vw, 62px);
+    margin-bottom: 20px;
+}
+
+.subtitle {
+    max-width: 800px;
+    margin: auto;
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.intro {
+    text-align: center;
+    padding: 55px 20px 35px;
+}
+
+.intro h2 {
+    font-size: 34px;
+    margin-bottom: 12px;
+}
+
+.intro p {
+    max-width: 750px;
+    margin: auto;
+    color: #6b7280;
+}
+
+.projects {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    padding-bottom: 70px;
+}
+
+.card {
+    background: white;
+    border-radius: 18px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.number {
+    font-size: 14px;
+    font-weight: bold;
+    color: #6b7280;
+    margin-bottom: 12px;
+}
+
+.card h3 {
+    font-size: 24px;
+    margin-bottom: 14px;
+}
+
+.card p {
+    color: #6b7280;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.tech {
+    display: block;
+    font-size: 13px;
+    color: #374151;
+    background: #f3f4f6;
+    padding: 9px 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.button {
+    text-decoration: none;
+    text-align: center;
+    padding: 12px 18px;
+    border-radius: 9px;
+    background: #1f3a5f;
+    color: white;
+    font-weight: bold;
+    transition: background 0.2s ease;
+}
+
+.button:hover {
+    background: #111827;
+}
+
+footer {
+    background: #111827;
+    color: #d1d5db;
+    text-align: center;
+    padding: 25px;
+    font-size: 14px;
+}
+
+@media (max-width: 900px) {
+    .projects {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .projects {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 60px 20px;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+    }
+}
