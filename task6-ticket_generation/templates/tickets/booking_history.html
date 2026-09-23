@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>Booking History</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .button {
+            display: inline-block;
+            padding: 9px 14px;
+            background: #111827;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .pending {
+            color: #b45309;
+        }
+
+        .sent {
+            color: #166534;
+        }
+
+        .failed {
+            color: #b91c1c;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>
+        Booking History
+    </h1>
+
+
+    {% for booking in bookings %}
+
+        <div class="card">
+
+            <h2>
+                {{ booking.movie_title }}
+            </h2>
+
+            <p>
+                Booking ID:
+                {{ booking.booking_id }}
+            </p>
+
+            <p>
+                Theater:
+                {{ booking.theater_name }}
+            </p>
+
+            <p>
+                Screen:
+                {{ booking.screen_name }}
+            </p>
+
+            <p>
+                Show:
+                {{ booking.show_time|date:"d M Y, h:i A" }}
+            </p>
+
+            <p>
+                Seats:
+                {{ booking.booked_seats|join:", " }}
+            </p>
+
+            <p>
+                Payment:
+                {{ booking.payment_reference }}
+            </p>
+
+            {% if booking.ticket %}
+
+                <p>
+                    Email Status:
+
+                    <strong>
+
+                        {{ booking.ticket.get_email_status_display }}
+
+                    </strong>
+
+                </p>
+
+
+                {% if booking.ticket.pdf_file %}
+
+                    <a
+                        class="button"
+                        href="{% url 'download_ticket' booking.id %}"
+                    >
+                        Download Ticket
+                    </a>
+
+                {% else %}
+
+                    <span class="pending">
+                        Ticket is being generated...
+                    </span>
+
+                {% endif %}
+
+            {% else %}
+
+                <span class="pending">
+                    Ticket processing...
+                </span>
+
+            {% endif %}
+
+        </div>
+
+    {% empty %}
+
+        <p>
+            No bookings found.
+        </p>
+
+    {% endfor %}
+
+</div>
+
+</body>
+
+</html>

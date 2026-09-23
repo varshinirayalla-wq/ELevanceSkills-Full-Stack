@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Ticket Verification</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .valid {
+            color: #166534;
+        }
+
+        .invalid {
+            color: #b91c1c;
+        }
+
+        .detail {
+            margin: 10px 0;
+        }
+
+        .label {
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        {% if is_valid %}
+
+            <h1 class="valid">
+                ✓ Valid Ticket
+            </h1>
+
+            <p>
+                This booking has been successfully verified.
+            </p>
+
+        {% else %}
+
+            <h1 class="invalid">
+                ✕ Invalid Ticket
+            </h1>
+
+            <p>
+                This booking is not confirmed.
+            </p>
+
+        {% endif %}
+
+
+        <div class="detail">
+
+            <span class="label">
+                Booking ID:
+            </span>
+
+            {{ booking.booking_id }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Movie:
+            </span>
+
+            {{ booking.movie_title }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Theater:
+            </span>
+
+            {{ booking.theater_name }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Screen:
+            </span>
+
+            {{ booking.screen_name }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Show:
+            </span>
+
+            {{ booking.show_time|date:"d M Y, h:i A" }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Seats:
+            </span>
+
+            {{ booking.booked_seats|join:", " }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Payment Reference:
+            </span>
+
+            {{ booking.payment_reference }}
+
+        </div>
+
+
+        <div class="detail">
+
+            <span class="label">
+                Status:
+            </span>
+
+            {{ booking.get_status_display }}
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
