@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>{{ movie.title }}</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .poster {
+            width: 250px;
+            height: 350px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .meta {
+            margin: 10px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <a
+        href="{% url 'movie_list' %}"
+        class="back"
+    >
+        ← Back to Movies
+    </a>
+
+
+    <div class="card">
+
+        <h1>
+            {{ movie.title }}
+        </h1>
+
+
+        <div class="poster">
+
+            {% if movie.poster_url %}
+
+                <img
+                    src="{{ movie.poster_url }}"
+                    alt="{{ movie.title }}"
+                >
+
+            {% else %}
+
+                No Poster
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="meta">
+            Language:
+            {{ movie.language.name }}
+        </div>
+
+
+        <div class="meta">
+            Genres:
+
+            {% for genre in movie.genres.all %}
+
+                {{ genre.name }}{% if not forloop.last %}, {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+
+        <div class="meta">
+            Release Date:
+            {{ movie.release_date|date:"d M Y" }}
+        </div>
+
+
+        <div class="meta">
+            Rating:
+            ★ {{ movie.rating }}
+        </div>
+
+
+        <p>
+            {{ movie.description }}
+        </p>
+
+
+        <h2>
+            Available Shows
+        </h2>
+
+
+        {% if shows %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>City</th>
+                        <th>Theater</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Ticket Price</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for show in shows %}
+
+                        <tr>
+
+                            <td>
+                                {{ show.theater.city.name }}
+                            </td>
+
+                            <td>
+                                {{ show.theater.name }}
+                            </td>
+
+                            <td>
+                                {{ show.show_time|date:"d M Y" }}
+                            </td>
+
+                            <td>
+                                {{ show.show_time|date:"h:i A" }}
+                            </td>
+
+                            <td>
+                                ₹{{ show.ticket_price }}
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        {% else %}
+
+            <p>
+                No upcoming shows available.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
